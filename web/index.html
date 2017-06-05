@@ -1,0 +1,75 @@
+<body>
+<style>
+
+
+div {
+	position: absolute;
+	box-sizing: border-box;
+	
+}
+
+</style>
+<script src="gargml.js"></script>
+<script>
+
+
+function render(on, node) {
+	var div = document.createElement("div");
+	on.appendChild( div );
+
+	var frame = node.frame();
+	div.style.left = frame.x + 'px'
+	div.style.top = frame.y + 'px';
+	div.style.width = frame.width + 'px';
+	div.style.height = frame.height+ 'px';
+
+	if("fill" in node.atts) {
+		div.style.background = node.atts["fill"];
+	}
+	if("opacity" in node.atts) {
+		div.style.opacity = node.atts["opacity"];
+	}
+
+	if("text" in node.atts) {
+		div.innerText = node.atts["text"];
+		if("align" in node.atts) {
+			div.style.textAlign = node.atts["align"];
+		}
+	}
+
+
+
+	node.subs.forEach( function(n) {
+		render(div, n);
+	});
+}
+
+
+var dummy = document.createElement("div");
+dummy.style.visibility = 'hidden';
+document.body.appendChild(dummy);
+
+var url = "examples/all.gar";
+
+var oReq = new XMLHttpRequest();
+oReq.addEventListener('load', function() {
+
+	var root = gargml( this.responseText, function(node,width) {
+		dummy.innerText = node.atts["text"];
+
+		return {
+			width:width,
+			height: dummy.clientHeight
+		}
+
+
+	});
+	render(document.body, root);
+});
+
+oReq.open("get", url, true);
+oReq.send();
+
+
+</script>
+</body>

@@ -1,24 +1,45 @@
 div {
 width: 360;
 height: 640;
+fill: #ddd;
 	{
+	tlr: 20;
+		fill: #eee;
+		{
+		tldr: 20;
+		text: GargML;
+		fill: white;
+		align: center;
+		}
+
+		{
+		height: 4;
+		d: 1;
+		fill: red;
+		}
+	}
+	{
+	fill: white;
 	tldr: 20;
 		{
-		tlr: 20;
+		lr: 20;
 			{
 			td: 20;
 			left: 16;
-			size: 50;
+			square: 50;
 			flow: side;
-			background: red;
+			fill: red;
 			}
 
 			< {
+			opacity: 0.8;
 			}
 
 			< {
+			opacity: 0.6;
 			}
 			< {
+			opacity: 0.4;
 			}
 		}
 
