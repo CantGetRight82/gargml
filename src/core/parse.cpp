@@ -1,4 +1,6 @@
 #include "parse.h"
+#include "../../vendor/kiwi/kiwi/kiwi.h"
+#include "../../vendor/kiwi/kiwi/debug.h"
 
 class SymbolPos {
 	public:
@@ -21,29 +23,23 @@ string trimBefore( const char* buffer, vector<SymbolPos>& positions, int i) {
 
 }
 
-string tldrProp( char code ) {
-	switch(code) {
-		case 't': return "top";
-		case 'l': return "left";
-		case 'd': return "down";
-		case 'r': return "right";
-	}
-	return "notldr";
-}
 
-
-bool tldr(Node* node, string key, string val) {
+bool trbl(Node* node, string key, string val) {
 	int size = key.size();
 	if(size>4) { return false; }
 	for(int i=0; i<size; i++) {
-		if(strchr("tldr", key[i]) == NULL) {
+		if(strchr("trbl", key[i]) == NULL) {
 			return false;
 		}
 	}
 
 	for(int i=0; i<size; i++) {
-		string prop = tldrProp( key[i] );
-		node->atts[ prop ] = val;
+		switch(key[i]) {
+			case 't': node->atts["top"] = val; break;
+			case 'r': node->atts["right"] = val; break;
+			case 'b': node->atts["bottom"] = val; break;
+			case 'l': node->atts["left"] = val; break;
+		}
 	}
 	return true;
 }
@@ -97,6 +93,7 @@ Node* parse(string str) {
 			if(top) {
 				if(top->subs.size()) {
 					node->prev = top->subs.back();
+					node->prev->next = node;
 				}
 				top->subs.push_back( node );
 			}
@@ -114,7 +111,7 @@ Node* parse(string str) {
 			key = str;
 		} else if(symbol == ';') {
 			if(key.size() && str.size()) {
-				if(tldr(top, key, str)) {
+				if(trbl(top, key, str)) {
 				} else if(key.compare("size") == 0) {
 					top->atts[ "width" ] = str;
 					top->atts[ "height" ] = str;
@@ -123,6 +120,17 @@ Node* parse(string str) {
 				}
 			}
 		}
+	}
+	try {
+
+		kiwi::Solver* solver = new kiwi::Solver();
+		root->constrain( solver ); 
+		solver->updateVariables();
+	} catch(kiwi::UnsatisfiableConstraint e) {
+		cout<<e.what()<<endl;
+		kiwi::debug::dump( e.constraint() );
+	} catch(const char* e) {
+		cout<<e<<endl;
 	}
 	return root;
 }

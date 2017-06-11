@@ -1,0 +1,28 @@
+
+{
+size: 100;
+	{
+	tlbr: 10;
+		{
+		trbl: 10;
+		left: 5;
+		right: 4;
+		stroke: red;
+		width: 0;
+		flow: side;
+		}
+		< {
+		stroke: green;
+		}
+
+		< {
+		stroke: blue;
+		}
+
+
+	}
+
+	< {
+	height: 0;
+	}
+}

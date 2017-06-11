@@ -17,7 +17,7 @@ OBJEXT      := o
 #Flags, Libraries and Includes
 CFLAGS      := -Wall -O3 -g
 CFLAGS      := -g -std=c++11
-LIB         := -lgd -lpng -lz -ljpeg -lfreetype -lm 
+LIB         := -lgd
 INC         := -I$(INCDIR) -I/usr/local/include
 INCDEP      := -I$(INCDIR)
 
@@ -29,7 +29,14 @@ OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJE
 
 #Default Make
 all: resources $(TARGET)
-	@./bin/program ./examples/reference.gar ./output/reference.png
+	make examples
+
+examples:
+	./bin/program examples/box1.gar output/box1.png
+	./bin/program examples/box2.gar output/box2.png
+	./bin/program examples/box3.gar output/box3.png
+	# ./bin/program examples/box4.gar output/box4.png
+
 
 #Remake
 remake: cleaner all
@@ -68,7 +75,7 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
 
 #Non-File Targets
-.PHONY: all remake clean cleaner resources
+.PHONY: all examples remake clean cleaner resources
 
 #reference:
 #	clang++ src/gd/main.cpp -lgd -lpng -lz -ljpeg -lfreetype -lm -o ./test/gdgarg

@@ -1,0 +1,7 @@
+
+If 0 horizontal info, gets prev.left and prev.right
+If 1 horizontal info, get prev.left or prev.right (whichever missing)
+
+If 0 vertical info, gets prev.top and prev.bottom
+If 1 vertical info, gets prev.top or prev.bottom (whichever missing)
+

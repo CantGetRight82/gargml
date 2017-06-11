@@ -4,6 +4,8 @@
 #include <map>
 #include <math.h>
 
+#include "../../vendor/kiwi/kiwi/kiwi.h"
+
 using namespace std;
 
 class Node {
@@ -11,111 +13,70 @@ class Node {
 		static Node* zero;
 		Node* parent;
 		Node* prev;
-
-		Node() : parent(NULL), prev(NULL) {
-		}
-		float left() {
-			float left = attf("left");
-			if(!isnan(left)) {
-				if(!isFirstChild() && isFlowSide()) {
-					return prev->right() + left;
-				}
-				return parentz()->left() + left;
-			}
-			return 0;
-		}
-		float top() {
-			float top = attf("top");
-			if(!isnan(top)) {
-				if(isFirstChild()) {
-					return parentz()->top() + top;
-				}
-				if(isFlowSide()) {
-					return parentz()->top() + top;
-				}
-				return prev->down() + top;
-				
-			}
-			return 0;
-		}
-
-
-
-		bool isFirstChild() {
-			return prev == NULL;
-		}
-
-		bool isFlowSide() {
-			return atts["flow"].compare("side") == 0;
-		}
-
-
-		float right() {
-			float specr = attf("right");
-			if(!isnan(specr)) {
-				return parentz()->right() - specr;
-			}
-
-			float specw = attf("width");
-			if(!isnan(specw)) { return left() + specw; }
-			return left();
-		}
-		float down(bool allowParent = true) {
-
-			float spech = attf("height");
-			float specd = attf("down");
-			if(!isnan(specd)) {
-				if(allowParent) {
-					return parentz()->down() - specd;
-				} else {
-					return top() + spech + specd;
-				}
-			}
-
-			if(!isnan(spech)) { return top() + spech; }
-
-			float max = top();
-			for(Node* n : subs) {
-				max = fmaxf( max, n->down(false) );
-
-			}
-
-			return max;
-		}
+		Node* next;
 
 		map<string,string> atts;
 		vector<Node*> subs;
 
+		map<string, kiwi::Variable> vars;
+
 		void renderJSON(std::ostream& to);
 		int atti(string key);
+		uint32_t color(string key);
 		float attf(string key);
 
-		Node* parentz() {
-			if(parent) { return parent; }
-			if(!zero) {
-				zero = new Node();
-				zero->atts["top"] = "0";
-				zero->atts["left"] = "0";
-				zero->atts["down"] = "0";
-				zero->atts["right"] = "0";
+		string ids() {
+			if(parent) {
+				return parent->ids() + "." + std::to_string(parent->idx(this));
 			}
-			return zero;
+			return "0";
 		}
 
-		Node* clone() {
-			Node* result = new Node();
-			result->atts = this->atts;
-
-			vector<Node*>::iterator p;
-			for(p = subs.begin(); p != subs.end(); p++) {
-				result->subs.push_back( *p );
+		int idx(Node* child) {
+			for(int i=0; i<subs.size(); i++) {
+				if(child == subs[i]) { return i; }
 			}
+			return -1;
+		}
+
+		Node() : parent(NULL), prev(NULL), next(NULL) {
+			initVars();
+		}
+		void initVars();
+
+		float top() { return vars["top"].value(); }
+		float right() { return vars["right"].value(); }
+		float bottom() { return vars["bottom"].value(); }
+		float left() { return vars["left"].value(); }
+
+		vector<string> attsplit(string key, string delims) {
+			return split( atts[key], delims);
+		}
+
+		Node* getNode(string name) {
+			if(name == "p") { return parent; }
+			if(name == "prev") { return prev; }
+			if(name == "next") { return next; }
+			return this;
+		}
+
+		vector<string> split(string val, string delims) {
+			vector<string> result;
+			size_t current;
+			size_t next = -1;
+			do {
+				current = next + 1;
+				next = val.find_first_of( delims, current );
+				result.push_back( val.substr( current, next - current ) );
+			}
+			while (next != string::npos);
 			return result;
 		}
 
-		void pass1() {
-
-		}
 
 
+		void constrain(kiwi::Solver* solver);
+		void addStay(kiwi::Solver* solver, string key, float val);
+
+		Node* clone();
 };

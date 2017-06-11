@@ -26,7 +26,6 @@ int main(int c, const char** argv) {
 	Node* root = parse(buffer);
 	delete buffer;
 
-	root->pass1();
 	/* root->renderJSON(cout); */
 
 
