@@ -1,14 +1,9 @@
 #include "parse.h"
+#include "SymbolPos.h"
+
 #include "../../vendor/kiwi/kiwi/kiwi.h"
 #include "../../vendor/kiwi/kiwi/debug.h"
 
-class SymbolPos {
-	public:
-	char symbol;
-	size_t pos;
-	SymbolPos( char symbol, size_t pos ) : symbol(symbol), pos(pos) {
-	}
-};
 
 string trimBefore( const char* buffer, vector<SymbolPos>& positions, int i) {
 	int end = positions[i].pos-1;
@@ -46,20 +41,16 @@ bool trbl(Node* node, string key, string val) {
 
 Node* parse(string str) {
 	const char* buffer = str.c_str();
-	size_t size = str.size();
+	vector<SymbolPos> positions = SymbolPos::parse( str, "{}:;`" );
 
-	vector<SymbolPos> positions;
-	const char* delimeters = "{}:;`";
-	bool inString = false;
 	int level = 0;
-	for(int i=0; i<size; i++) {
-		if(strchr(delimeters, buffer[i]) != NULL) {
-			char c = buffer[i];
-			positions.push_back( SymbolPos( c, i ) );
-			if(c == '`') { inString = !inString; }
-			else if(c == '{' && !inString) { level++; }
-			else if(c == '}' && !inString) { level--; }
-		}
+	bool inString = false;
+	for(SymbolPos sp : positions) {
+		char c = sp.symbol;
+		if(c == '`') { inString = !inString; }
+		else if(c == '{' && !inString) { level++; }
+		else if(c == '}' && !inString) { level--; }
+
 	}
 
 	if(level != 0) {
