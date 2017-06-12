@@ -27,9 +27,9 @@ INCDEP      := -I$(INCDIR)
 SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
-testexpr:
-	clang++ test/exprtest.cpp -std=c++11 -o bin/exprtest
-	./bin/exprtest
+testep:
+	clang++ test/testep.cpp -std=c++11 -o bin/testep
+	./bin/testep
 	
 all: resources $(TARGET)
 	make examples
