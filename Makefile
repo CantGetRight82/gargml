@@ -27,6 +27,10 @@ INCDEP      := -I$(INCDIR)
 SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
+testsol:
+	clang++ test/testsol.cpp -std=c++11 -o bin/testsol
+	./bin/testsol
+
 testep:
 	clang++ test/testep.cpp -std=c++11 -o bin/testep
 	./bin/testep
